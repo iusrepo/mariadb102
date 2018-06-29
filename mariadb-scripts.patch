@@ -1,13 +1,13 @@
 We have some downstream patches and other scripts that include variables to
 be expanded by cmake. Cmake needs to know about them, so adding them manually.
 
-diff -up mariadb-10.2.8/scripts/CMakeLists.txt.p7 mariadb-10.2.8/scripts/CMakeLists.txt
---- mariadb-10.2.8/scripts/CMakeLists.txt.p7	2017-08-20 13:26:10.640779557 +0200
-+++ mariadb-10.2.8/scripts/CMakeLists.txt	2017-08-20 13:27:05.774925486 +0200
-@@ -338,6 +338,33 @@ ELSE()
+--- mariadb-10.2.16/scripts/CMakeLists.txt	2018-06-25 13:13:26.000000000 +0200
++++ mariadb-10.2.16/scripts/CMakeLists.txt_patched	2018-06-29 13:32:12.538880486 +0200
+@@ -360,6 +360,34 @@ ELSE()
+       COMPONENT ${${file}_COMPONENT}
       )
    ENDFOREACH()
- 
++
 +  # files for systemd
 +  SET(SYSTEMD_SCRIPTS
 +    mysql.tmpfiles.d

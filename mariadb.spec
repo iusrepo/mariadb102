@@ -145,11 +145,11 @@
 # Make long macros shorter
 %global sameevr   %{epoch}:%{version}-%{release}
 %global compatver 10.2
-%global bugfixver 15
+%global bugfixver 16
 
 Name:             mariadb
 Version:          %{compatver}.%{bugfixver}
-Release:          2%{?with_debug:.debug}%{?dist}
+Release:          1%{?with_debug:.debug}%{?dist}
 Epoch:            3
 
 Summary:          A community developed branch of MySQL
@@ -193,9 +193,6 @@ Patch9:           %{pkgnamepatch}-ownsetup.patch
 # Patches specific for this mysql package
 #   Patch37: don't create a test DB: https://jira.mariadb.org/browse/MDEV-12645
 Patch37:          %{pkgnamepatch}-notestdb.patch
-
-# Patches for galera
-Patch40:          %{pkgnamepatch}-galera.cnf.patch
 
 BuildRequires:    cmake gcc-c++
 BuildRequires:    multilib-rpm-config
@@ -710,7 +707,6 @@ find . -name "*.jar" -type f -exec rm --verbose -f {} \;
 %patch7 -p1
 %patch9 -p1
 %patch37 -p1
-%patch40 -p1
 
 # workaround for upstream bug #56342
 rm mysql-test/t/ssl_8k_key-master.opt
@@ -1347,12 +1343,7 @@ fi
 %{_bindir}/resolve_stack_dump
 %{_bindir}/resolveip
 # wsrep_sst_common should be moved to /usr/share/mariadb: https://jira.mariadb.org/browse/MDEV-14296
-%{_bindir}/wsrep_sst_common
-%{_bindir}/wsrep_sst_mariabackup
-%{_bindir}/wsrep_sst_mysqldump
-%{_bindir}/wsrep_sst_rsync
-%{_bindir}/wsrep_sst_xtrabackup
-%{_bindir}/wsrep_sst_xtrabackup-v2
+%{_bindir}/wsrep_*
 
 %config(noreplace) %{_sysconfdir}/my.cnf.d/%{pkg_name}-server.cnf
 
@@ -1404,11 +1395,7 @@ fi
 %{_mandir}/man1/resolveip.1*
 %{_mandir}/man1/resolve_stack_dump.1*
 %{_mandir}/man8/mysqld.8*
-%{_mandir}/man1/wsrep_sst_common.1*
-%{_mandir}/man1/wsrep_sst_mysqldump.1*
-%{_mandir}/man1/wsrep_sst_rsync.1*
-%{_mandir}/man1/wsrep_sst_xtrabackup.1*
-%{_mandir}/man1/wsrep_sst_xtrabackup-v2.1*
+%{_mandir}/man1/wsrep_*.1*
 
 %{_datadir}/%{pkg_name}/fill_help_tables.sql
 %{_datadir}/%{pkg_name}/install_spider.sql
@@ -1592,6 +1579,10 @@ fi
 %endif
 
 %changelog
+* Sat Jun 30 2018 Michal Schorm <mschorm@redhat.com> - 3:10.2.16-1
+- Rebase to 10.2.16
+  MyRocks is now Stable (GA)
+
 * Tue Jun 05 2018 Honza Horak <hhorak@redhat.com> - 3:10.2.15-2
 - Use mysqladmin for checking the socket
 - Jemalloc dependency moved to the TokuDB subpackage.
