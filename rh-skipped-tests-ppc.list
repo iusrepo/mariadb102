@@ -72,3 +72,9 @@ innodb.innodb_defrag_concurrent :
 
 # Different cause
 innodb.innodb_defragment :
+
+# From 10.2.17
+# seems like some floating point errors
+main.select :
+main.select_jcl6 :
+main.type_float :

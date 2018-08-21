@@ -145,7 +145,7 @@
 # Make long macros shorter
 %global sameevr   %{epoch}:%{version}-%{release}
 %global compatver 10.2
-%global bugfixver 16
+%global bugfixver 17
 
 Name:             mariadb
 Version:          %{compatver}.%{bugfixver}
@@ -1579,6 +1579,15 @@ fi
 %endif
 
 %changelog
+* Mon Aug 20 2018 Michal Schorm <mschorm@redhat.com> - 3:10.2.17-1
+- Rebase to 10.2.17
+- CVEs fixed: #1602428
+  CVE-2018-3060 CVE-2018-3064 CVE-2018-3063 CVE-2018-3058 CVE-2018-3066
+- CVEs fixed: #1564966
+  CVE-2018-2767
+- CVEs fixed: #1616261
+  CVE-2018-3081
+
 * Sat Jun 30 2018 Michal Schorm <mschorm@redhat.com> - 3:10.2.16-1
 - Rebase to 10.2.16
   MyRocks is now Stable (GA)
