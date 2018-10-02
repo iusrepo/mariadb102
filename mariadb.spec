@@ -145,11 +145,11 @@
 # Make long macros shorter
 %global sameevr   %{epoch}:%{version}-%{release}
 %global compatver 10.2
-%global bugfixver 17
+%global bugfixver 18
 
 Name:             mariadb
 Version:          %{compatver}.%{bugfixver}
-Release:          2%{?with_debug:.debug}%{?dist}
+Release:          1%{?with_debug:.debug}%{?dist}
 Epoch:            3
 
 Summary:          A community developed branch of MySQL
@@ -958,7 +958,8 @@ ln -s unstable-tests %{buildroot}%{_datadir}/mysql-test/rh-skipped-tests.list
 
 # Client that uses libmysqld embedded server.
 # Pretty much like normal mysql command line client, but it doesn't require a running mariadb server.
-%{?with_embedded:rm %{buildroot}%{_bindir}/mysql_embedded}
+%{?without_embedded:rm %{buildroot}%{_bindir}/mysql_embedded}
+rm %{buildroot}%{_mandir}/man1/mysql_embedded.1*
 # Static libraries
 rm %{buildroot}%{_libdir}/*.a
 # This script creates the MySQL system tables and starts the server.
@@ -1019,7 +1020,6 @@ sed -i 's/^plugin-load-add/#plugin-load-add/' %{buildroot}%{_sysconfdir}/my.cnf.
 rm %{buildroot}%{_mandir}/man1/{mysql_client_test_embedded,mysqltest_embedded}.1*
 %endif
 
-
 %if %{without clibrary}
 rm %{buildroot}%{_sysconfdir}/my.cnf.d/client.cnf
 # Client library and links
@@ -1069,7 +1069,7 @@ mysqldump,mysqlimport,mysqlshow,mysqlslap}.1*
 %if %{without tokudb}
 # because upstream ships manpages for tokudb even on architectures that tokudb doesn't support
 rm %{buildroot}%{_mandir}/man1/tokuftdump.1*
-rm %{buildroot}%{_mandir}/man1/tokuft_logdump.1*
+rm %{buildroot}%{_mandir}/man1/tokuft_logprint.1*
 %else
 %if 0%{?fedora} >= 28 || 0%{?rhel} > 7
 echo 'Environment="LD_PRELOAD=%{_libdir}/libjemalloc.so.2"' >> %{buildroot}%{_sysconfdir}/systemd/system/mariadb.service.d/tokudb.conf
@@ -1121,6 +1121,9 @@ rm %{buildroot}%{_bindir}/galera_recovery
 rm %{buildroot}%{_datadir}/%{pkg_name}/systemd/use_galera_new_cluster.conf
 %endif
 
+%if %{without rocksdb}
+rm %{buildroot}%{_mandir}/man1/mysql_ldb.1*
+%endif
 
 
 %check
@@ -1457,6 +1460,8 @@ fi
 %files backup
 %{_bindir}/mariabackup
 %{_bindir}/mbstream
+%{_mandir}/man1/mariabackup.1*
+%{_mandir}/man1/mbstream.1*
 %endif
 
 %if %{with rocksdb}
@@ -1466,6 +1471,7 @@ fi
 %{_bindir}/mysql_ldb
 %{_bindir}/sst_dump
 %{_libdir}/%{pkg_name}/plugin/ha_rocksdb.so
+%{_mandir}/man1/mysql_ldb.1*
 %endif
 
 %if %{with tokudb}
@@ -1473,7 +1479,7 @@ fi
 %{_bindir}/tokuftdump
 %{_bindir}/tokuft_logprint
 %{_mandir}/man1/tokuftdump.1*
-%{_mandir}/man1/tokuft_logdump.1*
+%{_mandir}/man1/tokuft_logprint.1*
 %config(noreplace) %{_sysconfdir}/my.cnf.d/tokudb.cnf
 %{_libdir}/%{pkg_name}/plugin/ha_tokudb.so
 /usr/lib/systemd/system/mariadb.service.d/tokudb.conf
@@ -1563,22 +1569,29 @@ fi
 
 %if %{with test}
 %files test
+%if %{with embedded}
+%{_bindir}/mysql_client_test_embedded
+%{_bindir}/mysqltest_embedded
+%{_mandir}/man1/mysql_client_test_embedded.1*
+%{_mandir}/man1/mysqltest_embedded.1*
+%endif
 %{_bindir}/mysql_client_test
 %{_bindir}/my_safe_process
-%{_bindir}/mysql_client_test_embedded
 %{_bindir}/mysqltest
-%{_bindir}/mysqltest_embedded
 %attr(-,mysql,mysql) %{_datadir}/mysql-test
 %{_mandir}/man1/mysql_client_test.1*
 %{_mandir}/man1/my_safe_process.1*
-%{_mandir}/man1/mysql_client_test_embedded.1*
 %{_mandir}/man1/mysqltest.1*
-%{_mandir}/man1/mysqltest_embedded.1*
 %{_mandir}/man1/mysql-stress-test.pl.1*
 %{_mandir}/man1/mysql-test-run.pl.1*
 %endif
 
 %changelog
+* Wed Sep 26 2018 Michal Schorm <mschorm@redhat.com> - 3:10.2.18-1
+- Rebase to 10.2.18
+- CVE's fixed:
+  CVE-2018-3060 CVE-2018-3064 CVE-2018-3063 CVE-2018-3058 CVE-2018-3066
+
 * Tue Sep 04 2018 Michal Schorm <mschorm@redhat.com> - 3:10.2.17-2
 - Fix parallel installability of x86_64 and i686 devel packages
 
