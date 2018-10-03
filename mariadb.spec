@@ -958,7 +958,7 @@ ln -s unstable-tests %{buildroot}%{_datadir}/mysql-test/rh-skipped-tests.list
 
 # Client that uses libmysqld embedded server.
 # Pretty much like normal mysql command line client, but it doesn't require a running mariadb server.
-%{?without_embedded:rm %{buildroot}%{_bindir}/mysql_embedded}
+%{?with_embedded:rm %{buildroot}%{_bindir}/mysql_embedded}
 rm %{buildroot}%{_mandir}/man1/mysql_embedded.1*
 # Static libraries
 rm %{buildroot}%{_libdir}/*.a
