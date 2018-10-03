@@ -1589,8 +1589,6 @@ fi
 %changelog
 * Wed Sep 26 2018 Michal Schorm <mschorm@redhat.com> - 3:10.2.18-1
 - Rebase to 10.2.18
-- CVE's fixed:
-  CVE-2018-3060 CVE-2018-3064 CVE-2018-3063 CVE-2018-3058 CVE-2018-3066
 
 * Tue Sep 04 2018 Michal Schorm <mschorm@redhat.com> - 3:10.2.17-2
 - Fix parallel installability of x86_64 and i686 devel packages
