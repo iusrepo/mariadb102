@@ -149,7 +149,7 @@
 
 Name:             mariadb
 Version:          %{compatver}.%{bugfixver}
-Release:          1%{?with_debug:.debug}%{?dist}
+Release:          2%{?with_debug:.debug}%{?dist}
 Epoch:            3
 
 Summary:          A community developed branch of MySQL
@@ -875,6 +875,11 @@ for header in mysql/server/my_config.h mysql/server/private/config.h; do
 %multilib_fix_c_header --file %{_includedir}/$header
 done
 
+%if 0%{?fedora} < 28
+%multilib_fix_c_header --file %{_includedir}/mysql/mariadb_version.h
+%endif
+
+
 ln -s mysql_config.1.gz %{buildroot}%{_mandir}/man1/mariadb_config.1.gz
 
 # multilib support for shell scripts
@@ -1587,6 +1592,9 @@ fi
 %endif
 
 %changelog
+* Fri Oct 19 2018 Michal Schorm <mschorm@redhat.com> - 3:10.2.18-2
+- Fix parallel installability for x86_64 and i686 devel packages on F<=27
+
 * Wed Sep 26 2018 Michal Schorm <mschorm@redhat.com> - 3:10.2.18-1
 - Rebase to 10.2.18
 
