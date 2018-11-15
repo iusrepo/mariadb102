@@ -897,7 +897,7 @@ fi
 # TODO: check, if it changes location inside that file depending on values passed to Cmake
 mkdir -p %{buildroot}/%{_libdir}/pkgconfig
 mv %{buildroot}/%{_datadir}/pkgconfig/mariadb.pc %{buildroot}/%{_libdir}/pkgconfig
-%if %{__isa_bits} != 32
+%if 0%{?__isa_bits} != 32
 mv %{buildroot}/usr/lib/pkgconfig/libmariadb.pc %{buildroot}/%{_libdir}/pkgconfig
 %endif
 
