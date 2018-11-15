@@ -145,11 +145,11 @@
 # Make long macros shorter
 %global sameevr   %{epoch}:%{version}-%{release}
 %global compatver 10.2
-%global bugfixver 18
+%global bugfixver 19
 
 Name:             mariadb
 Version:          %{compatver}.%{bugfixver}
-Release:          2%{?with_debug:.debug}%{?dist}
+Release:          1%{?with_debug:.debug}%{?dist}
 Epoch:            3
 
 Summary:          A community developed branch of MySQL
@@ -896,7 +896,10 @@ fi
 # Reported to upstream as: https://jira.mariadb.org/browse/MDEV-14340
 # TODO: check, if it changes location inside that file depending on values passed to Cmake
 mkdir -p %{buildroot}/%{_libdir}/pkgconfig
-mv %{buildroot}/%{_datadir}/pkgconfig/*.pc %{buildroot}/%{_libdir}/pkgconfig
+mv %{buildroot}/%{_datadir}/pkgconfig/mariadb.pc %{buildroot}/%{_libdir}/pkgconfig
+%if %{__isa_bits} != 32
+mv %{buildroot}/usr/lib/pkgconfig/libmariadb.pc %{buildroot}/%{_libdir}/pkgconfig
+%endif
 
 # install INFO_SRC, INFO_BIN into libdir (upstream thinks these are doc files,
 # but that's pretty wacko --- see also %%{name}-file-contents.patch)
@@ -1055,6 +1058,7 @@ rm -r %{buildroot}%{_includedir}/mysql/{mariadb,mysql}
 rm -r %{buildroot}%{_includedir}/mysql
 rm %{buildroot}%{_datadir}/aclocal/mysql.m4
 rm %{buildroot}%{_libdir}/pkgconfig/mariadb.pc
+rm %{buildroot}%{_libdir}/pkgconfig/libmariadb.pc
 %if %{with clibrary}
 rm %{buildroot}%{_libdir}/libmariadb*.so
 unlink %{buildroot}%{_libdir}/libmysqlclient.so
@@ -1546,6 +1550,7 @@ fi
 %{_includedir}/*
 %{_datadir}/aclocal/mysql.m4
 %{_libdir}/pkgconfig/mariadb.pc
+%{_libdir}/pkgconfig/libmariadb.pc
 %if %{with clibrary}
 %{_libdir}/{libmysqlclient.so.18,libmariadb.so,libmysqlclient.so,libmysqlclient_r.so}
 %{_bindir}/mysql_config*
@@ -1592,6 +1597,13 @@ fi
 %endif
 
 %changelog
+* Wed Nov 14 2018 Michal Schorm <mschorm@redhat.com> - 3:10.2.19-1
+- Rebase to 10.2.19
+- CVEs fixed:
+  CVE-2018-3282 CVE-2016-9843 CVE-2018-3174 CVE-2018-3143 CVE-2018-3156
+  CVE-2018-3251 CVE-2018-3185 CVE-2018-3277 CVE-2018-3162 CVE-2018-3173
+  CVE-2018-3200 CVE-2018-3284
+
 * Fri Oct 19 2018 Michal Schorm <mschorm@redhat.com> - 3:10.2.18-2
 - Fix parallel installability for x86_64 and i686 devel packages on F<=27
 
