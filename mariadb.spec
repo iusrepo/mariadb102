@@ -149,7 +149,7 @@
 
 Name:             mariadb
 Version:          %{compatver}.%{bugfixver}
-Release:          1%{?with_debug:.debug}%{?dist}
+Release:          2%{?with_debug:.debug}%{?dist}
 Epoch:            3
 
 Summary:          A community developed branch of MySQL
@@ -897,9 +897,8 @@ fi
 # TODO: check, if it changes location inside that file depending on values passed to Cmake
 mkdir -p %{buildroot}/%{_libdir}/pkgconfig
 mv %{buildroot}/%{_datadir}/pkgconfig/mariadb.pc %{buildroot}/%{_libdir}/pkgconfig
-%if 0%{?__isa_bits} != 32
-mv %{buildroot}/usr/lib/pkgconfig/libmariadb.pc %{buildroot}/%{_libdir}/pkgconfig
-%endif
+# Client part should be included in package 'mariadb-connector-c'
+rm %{buildroot}/usr/lib/pkgconfig/libmariadb.pc
 
 # install INFO_SRC, INFO_BIN into libdir (upstream thinks these are doc files,
 # but that's pretty wacko --- see also %%{name}-file-contents.patch)
@@ -1058,7 +1057,6 @@ rm -r %{buildroot}%{_includedir}/mysql/{mariadb,mysql}
 rm -r %{buildroot}%{_includedir}/mysql
 rm %{buildroot}%{_datadir}/aclocal/mysql.m4
 rm %{buildroot}%{_libdir}/pkgconfig/mariadb.pc
-rm %{buildroot}%{_libdir}/pkgconfig/libmariadb.pc
 %if %{with clibrary}
 rm %{buildroot}%{_libdir}/libmariadb*.so
 unlink %{buildroot}%{_libdir}/libmysqlclient.so
@@ -1550,7 +1548,6 @@ fi
 %{_includedir}/*
 %{_datadir}/aclocal/mysql.m4
 %{_libdir}/pkgconfig/mariadb.pc
-%{_libdir}/pkgconfig/libmariadb.pc
 %if %{with clibrary}
 %{_libdir}/{libmysqlclient.so.18,libmariadb.so,libmysqlclient.so,libmysqlclient_r.so}
 %{_bindir}/mysql_config*
@@ -1597,6 +1594,9 @@ fi
 %endif
 
 %changelog
+* Mon Dec 10 2018 Michal Schorm <mschorm@redhat.com> - 3:10.2.19-2
+- Move libmariadb packageconfig file, it should be in 'mariadb-connector-c'
+
 * Wed Nov 14 2018 Michal Schorm <mschorm@redhat.com> - 3:10.2.19-1
 - Rebase to 10.2.19
 - CVEs fixed:
