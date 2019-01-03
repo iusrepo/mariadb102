@@ -145,11 +145,11 @@
 # Make long macros shorter
 %global sameevr   %{epoch}:%{version}-%{release}
 %global compatver 10.2
-%global bugfixver 19
+%global bugfixver 21
 
 Name:             mariadb
 Version:          %{compatver}.%{bugfixver}
-Release:          2%{?with_debug:.debug}%{?dist}
+Release:          1%{?with_debug:.debug}%{?dist}
 Epoch:            3
 
 Summary:          A community developed branch of MySQL
@@ -826,6 +826,7 @@ export CFLAGS CXXFLAGS
          -DINSTALL_SCRIPTDIR=bin \
          -DINSTALL_SQLBENCHDIR=share \
          -DINSTALL_SUPPORTFILESDIR=share/%{pkg_name} \
+         -DINSTALL_PCDIR=%{_lib}/pkgconfig \
          -DMYSQL_DATADIR="%{dbdatadir}" \
          -DMYSQL_UNIX_ADDR="/var/lib/mysql/mysql.sock" \
          -DTMPDIR=/var/tmp \
@@ -898,7 +899,7 @@ fi
 mkdir -p %{buildroot}/%{_libdir}/pkgconfig
 mv %{buildroot}/%{_datadir}/pkgconfig/mariadb.pc %{buildroot}/%{_libdir}/pkgconfig
 # Client part should be included in package 'mariadb-connector-c'
-rm %{buildroot}/usr/lib/pkgconfig/libmariadb.pc
+rm %{buildroot}%{_libdir}/pkgconfig/libmariadb.pc
 
 # install INFO_SRC, INFO_BIN into libdir (upstream thinks these are doc files,
 # but that's pretty wacko --- see also %%{name}-file-contents.patch)
@@ -1079,6 +1080,7 @@ rm %{buildroot}%{_mandir}/man1/tokuftdump.1*
 rm %{buildroot}%{_mandir}/man1/tokuft_logprint.1*
 %else
 %if 0%{?fedora} >= 28 || 0%{?rhel} > 7
+mkdir -p %{buildroot}%{_sysconfdir}/systemd/system/mariadb.service.d
 echo 'Environment="LD_PRELOAD=%{_libdir}/libjemalloc.so.2"' >> %{buildroot}%{_sysconfdir}/systemd/system/mariadb.service.d/tokudb.conf
 %endif
 # Move to better location, systemd config files has to be in /lib/
@@ -1594,6 +1596,9 @@ fi
 %endif
 
 %changelog
+* Thu Jan 03 2019 Michal Schorm <mschorm@redhat.com> - 3:10.2.21-1
+- Rebase to 10.2.21
+
 * Mon Dec 10 2018 Michal Schorm <mschorm@redhat.com> - 3:10.2.19-2
 - Move libmariadb packageconfig file, it should be in 'mariadb-connector-c'
 
