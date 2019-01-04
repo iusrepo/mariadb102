@@ -149,7 +149,7 @@
 
 Name:             mariadb
 Version:          %{compatver}.%{bugfixver}
-Release:          1%{?with_debug:.debug}%{?dist}
+Release:          2%{?with_debug:.debug}%{?dist}
 Epoch:            3
 
 Summary:          A community developed branch of MySQL
@@ -850,6 +850,7 @@ export CFLAGS CXXFLAGS
          -DPLUGIN_TOKUDB=%{?with_tokudb:DYNAMIC}%{!?with_tokudb:NO} \
          -DPLUGIN_CONNECT=%{?with_connect:DYNAMIC}%{!?with_connect:NO} \
          -DWITH_CASSANDRA=%{?with_cassandra:TRUE}%{!?with_cassandra:FALSE} \
+         -DPLUGIN_CACHING_SHA2_PASSWORD=%{?with_clibrary:DYNAMIC}%{!?with_clibrary:OFF} \
          -DPLUGIN_AWS_KEY_MANAGEMENT=NO \
          -DCONNECT_WITH_MONGO=OFF \
          -DCONNECT_WITH_JDBC=OFF \
@@ -1596,8 +1597,11 @@ fi
 %endif
 
 %changelog
-* Thu Jan 03 2019 Michal Schorm <mschorm@redhat.com> - 3:10.2.21-1
+* Thu Jan 03 2019 Michal Schorm <mschorm@redhat.com> - 3:10.2.21-2
 - Rebase to 10.2.21
+- Disable building of the caching_sha2_password plugin, it is provided
+  by 'mariadb-connector-c'
+  Resolves: #1663478
 
 * Mon Dec 10 2018 Michal Schorm <mschorm@redhat.com> - 3:10.2.19-2
 - Move libmariadb packageconfig file, it should be in 'mariadb-connector-c'
