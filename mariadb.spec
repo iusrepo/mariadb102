@@ -8,6 +8,13 @@
 # Set this to 1 to see which tests fail, but 0 on production ready build
 %global ignore_testsuite_result 0
 
+# The last version on which the full testsuite has been run
+# In case of further rebuilds of that version, don't require full testsuite to be run
+# run only "main" suite
+%global last_tested_version 10.2.21
+# Set to 1 to force run the testsuite even if it was already tested in current version
+%global force_run_testsuite 0
+
 # In f20+ use unversioned docdirs, otherwise the old versioned one
 %global _pkgdocdirname %{pkg_name}%{!?_pkgdocdir:-%{version}}
 %{!?_pkgdocdir: %global _pkgdocdir %{_docdir}/%{pkg_name}-%{version}}
@@ -107,7 +114,6 @@
 
 # Include systemd files
 %global daemon_name %{name}
-%global daemondir %{_unitdir}
 %global daemon_no_prefix %{pkg_name}
 %global mysqld_pid_dir mariadb
 
@@ -149,7 +155,7 @@
 
 Name:             mariadb
 Version:          %{compatver}.%{bugfixver}
-Release:          2%{?with_debug:.debug}%{?dist}
+Release:          3%{?with_debug:.debug}%{?dist}
 Epoch:            3
 
 Summary:          A community developed branch of MySQL
@@ -401,10 +407,14 @@ Requires:         %{name}-common%{?_isa} = %{sameevr}
 Requires:         %{name}-errmsg%{?_isa} = %{sameevr}
 Recommends:       %{name}-server-utils%{?_isa} = %{sameevr}
 Recommends:       %{name}-backup%{?_isa} = %{sameevr}
-%{?with_cracklib:Recommends:       %{name}-cracklib-password-check%{?_isa} = %{sameevr}}
-%{?with_gssapi:Recommends:       %{name}-gssapi-server%{?_isa} = %{sameevr}}
-%{?with_rocksdb:Recommends:       %{name}-rocksdb-engine%{?_isa} = %{sameevr}}
-%{?with_tokudb:Recommends:       %{name}-tokudb-engine%{?_isa} = %{sameevr}}
+%{?with_cracklib:Recommends:   %{name}-cracklib-password-check%{?_isa} = %{sameevr}}
+%{?with_gssapi:Recommends:     %{name}-gssapi-server%{?_isa} = %{sameevr}}
+%{?with_rocksdb:Suggests:      %{name}-rocksdb-engine%{?_isa} = %{sameevr}}
+%{?with_tokudb:Suggests:       %{name}-tokudb-engine%{?_isa} = %{sameevr}}
+%{?with_sphinx:Suggests:       %{name}-sphinx-engine%{?_isa} = %{sameevr}}
+%{?with_oqgraph:Suggests:      %{name}-oqgraph-engine%{?_isa} = %{sameevr}}
+%{?with_connect:Suggests:      %{name}-connect-engine%{?_isa} = %{sameevr}}
+%{?with_cassandra:Suggests:    %{name}-cassandra-engine%{?_isa} = %{sameevr}}
 
 Suggests:         mytop
 
@@ -789,10 +799,9 @@ CFLAGS="$CFLAGS -ldl"
 %ifarch sparc sparcv9 sparc64
 CFLAGS=`echo $CFLAGS| sed -e "s|-O2|-O1|g" `
 %endif
-# significant performance gains can be achieved by compiling with -O3 optimization; rhbz#1051069
-%ifarch ppc64
-CFLAGS=`echo $CFLAGS| sed -e "s|-O2|-O3|g" `
-%endif
+
+# Override all optimization flags when making a debug build
+%{?with_debug: CFLAGS="$CFLAGS -O0 -g"}
 
 CXXFLAGS="$CFLAGS"
 export CFLAGS CXXFLAGS
@@ -898,7 +907,7 @@ fi
 # Reported to upstream as: https://jira.mariadb.org/browse/MDEV-14340
 # TODO: check, if it changes location inside that file depending on values passed to Cmake
 mkdir -p %{buildroot}/%{_libdir}/pkgconfig
-mv %{buildroot}/%{_datadir}/pkgconfig/mariadb.pc %{buildroot}/%{_libdir}/pkgconfig
+mv %{buildroot}/%{_datadir}/pkgconfig/*.pc %{buildroot}/%{_libdir}/pkgconfig
 # Client part should be included in package 'mariadb-connector-c'
 rm %{buildroot}%{_libdir}/pkgconfig/libmariadb.pc
 
@@ -1018,7 +1027,7 @@ rm -r %{buildroot}%{_datadir}/%{pkg_name}/policy/apparmor
 chmod -x %{buildroot}%{_datadir}/sql-bench/myisam.cnf
 
 # Disable plugins
-%if %{with ggsapi}
+%if %{with gssapi}
 sed -i 's/^plugin-load-add/#plugin-load-add/' %{buildroot}%{_sysconfdir}/my.cnf.d/auth_gssapi.cnf
 %endif
 %if %{with cracklib}
@@ -1081,11 +1090,9 @@ rm %{buildroot}%{_mandir}/man1/tokuftdump.1*
 rm %{buildroot}%{_mandir}/man1/tokuft_logprint.1*
 %else
 %if 0%{?fedora} >= 28 || 0%{?rhel} > 7
-mkdir -p %{buildroot}%{_sysconfdir}/systemd/system/mariadb.service.d
-echo 'Environment="LD_PRELOAD=%{_libdir}/libjemalloc.so.2"' >> %{buildroot}%{_sysconfdir}/systemd/system/mariadb.service.d/tokudb.conf
+mkdir -p %{buildroot}%{_unitdir}/mariadb.service.d
+echo -e '[Service]\nEnvironment="LD_PRELOAD=%{_libdir}/libjemalloc.so.2"' >> %{buildroot}%{_unitdir}/mariadb.service.d/tokudb.conf
 %endif
-# Move to better location, systemd config files has to be in /lib/
-mv %{buildroot}%{_sysconfdir}/systemd/system/mariadb.service.d %{buildroot}/usr/lib/systemd/system/
 %endif
 
 %if %{without config}
@@ -1163,26 +1170,33 @@ export MTR_BUILD_THREAD=%{__isa_bits}
   set -ex
 
   cd mysql-test
-  perl ./mysql-test-run.pl --force --retry=1 --ssl \
-    --suite-timeout=900 --testcase-timeout=30 \
-    --mysqld=--binlog-format=mixed --force-restart \
-    --shutdown-timeout=60 --max-test-fail=0 --big-test \
-    --skip-test=spider \
-%if %{ignore_testsuite_result}
-    || :
-%else
-    --skip-test-list=unstable-tests
-%endif
+  export common_testsuite_arguments=" --parallel=auto --force --retry=1 --suite-timeout=900 --testcase-timeout=30 --mysqld=--binlog-format=mixed --force-restart --shutdown-timeout=60 --max-test-fail=5 "
 
-# Second run for the SPIDER suites that fail with SCA (ssl self signed certificate)
-  perl ./mysql-test-run.pl --force --retry=0 \
-    --suite-timeout=720 --testcase-timeout=30 \
-    --mysqld=--binlog-format=mixed --force-restart \
-    --shutdown-timeout=60 --max-test-fail=0 --big-test \
-    --skip-ssl --suite=spider,spider/bg \
-%if %{ignore_testsuite_result}
-    || :
-%endif
+  # If full testsuite has already been run on this version and we don't explicitly want the full testsuite to be run
+  if [[ "%{last_tested_version}" == "%{version}" ]] && [[ %{force_run_testsuite} -eq 0 ]]
+  then
+    # in further rebuilds only run the basic "main" suite (~800 tests)
+    echo "running only base testsuite"
+    perl ./mysql-test-run.pl $common_testsuite_arguments --ssl --suite=main --mem --skip-test-list=unstable-tests
+  fi
+
+  # If either this version wasn't marked as tested yet or I explicitly want to run the testsuite, run everything we have (~4000 test)
+  if [[ "%{last_tested_version}" != "%{version}" ]] || [[ %{force_run_testsuite} -ne 0 ]]
+  then
+    echo "running advanced testsuite"
+    perl ./mysql-test-run.pl $common_testsuite_arguments --ssl --big-test --skip-test=spider \
+    %if %{ignore_testsuite_result}
+      --max-test-fail=9999 || :
+    %else
+      --skip-test-list=unstable-tests
+    %endif
+    # Second run for the SPIDER suites that fail with SCA (ssl self signed certificate)
+    perl ./mysql-test-run.pl $common_testsuite_arguments --skip-ssl --big-test --mem --suite=spider,spider/bg \
+    %if %{ignore_testsuite_result}
+      --max-test-fail=999 || :
+    %endif
+  # blank line
+  fi
 )
 
 %endif # if dry run
@@ -1376,7 +1390,7 @@ fi
 %{?with_cracklib:%exclude %{_libdir}/%{pkg_name}/plugin/cracklib_password_check.so}
 %{?with_rocksdb:%exclude %{_libdir}/%{pkg_name}/plugin/ha_rocksdb.so}
 %{?with_tokudb:%exclude %{_libdir}/%{pkg_name}/plugin/ha_tokudb.so}
-%{?with_ggsapi:%exclude %{_libdir}/%{pkg_name}/plugin/auth_gssapi.so}
+%{?with_gssapi:%exclude %{_libdir}/%{pkg_name}/plugin/auth_gssapi.so}
 %{?with_sphinx:%exclude %{_libdir}/%{pkg_name}/plugin/ha_sphinx.so}
 %{?with_cassandra:%exclude %{_libdir}/%{pkg_name}/plugin/ha_cassandra.so}
 %if %{with clibrary}
@@ -1443,7 +1457,8 @@ fi
 %{_datadir}/%{pkg_name}/systemd/mariadb@.service
 %endif
 
-%{daemondir}/%{daemon_name}*
+%{_unitdir}/%{daemon_name}*
+%{?with_tokudb:%exclude %{_unitdir}/mariadb.service.d/tokudb.conf}
 %{_libexecdir}/mysql-prepare-db-dir
 %{_libexecdir}/mysql-check-socket
 %{_libexecdir}/mysql-check-upgrade
@@ -1492,7 +1507,7 @@ fi
 %{_mandir}/man1/tokuft_logprint.1*
 %config(noreplace) %{_sysconfdir}/my.cnf.d/tokudb.cnf
 %{_libdir}/%{pkg_name}/plugin/ha_tokudb.so
-/usr/lib/systemd/system/mariadb.service.d/tokudb.conf
+%{_unitdir}/mariadb.service.d/tokudb.conf
 %endif
 
 %if %{with gssapi}
@@ -1597,6 +1612,15 @@ fi
 %endif
 
 %changelog
+* Mon Feb 11 2019 Michal Schorm <mschorm@redhat.com> - 3:10.2.21-3
+- Remove PPC64 optimizatation; Add debug build optimization
+- Fix gssapi plugin typo
+- Tweak the testsuite execution, speed up the testsuite on rebuilds
+- Change weak dependency of RocksDB and TokuDB storage engines from Recommends to Suggests
+- Add "Suggests" weak dependencies to more storage engines
+- Fix TokuDB Jemalloc ld_preload; #1668375 #1671962
+- Tweak macros usage
+
 * Thu Jan 03 2019 Michal Schorm <mschorm@redhat.com> - 3:10.2.21-2
 - Rebase to 10.2.21
 - Disable building of the caching_sha2_password plugin, it is provided
