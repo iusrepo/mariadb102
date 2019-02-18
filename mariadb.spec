@@ -11,7 +11,7 @@
 # The last version on which the full testsuite has been run
 # In case of further rebuilds of that version, don't require full testsuite to be run
 # run only "main" suite
-%global last_tested_version 10.2.21
+%global last_tested_version 10.2.22
 # Set to 1 to force run the testsuite even if it was already tested in current version
 %global force_run_testsuite 0
 
@@ -151,11 +151,11 @@
 # Make long macros shorter
 %global sameevr   %{epoch}:%{version}-%{release}
 %global compatver 10.2
-%global bugfixver 21
+%global bugfixver 22
 
 Name:             mariadb
 Version:          %{compatver}.%{bugfixver}
-Release:          3%{?with_debug:.debug}%{?dist}
+Release:          1%{?with_debug:.debug}%{?dist}
 Epoch:            3
 
 Summary:          A community developed branch of MySQL
@@ -1612,6 +1612,11 @@ fi
 %endif
 
 %changelog
+* Mon Feb 18 2019 Michal Schorm <mschorm@redhat.com> - 3:10.2.22-1
+- Rebase to 10.2.22
+- CVEs fixed:
+  CVE-2019-2510 CVE-2019-2537
+
 * Mon Feb 11 2019 Michal Schorm <mschorm@redhat.com> - 3:10.2.21-3
 - Remove PPC64 optimizatation; Add debug build optimization
 - Fix gssapi plugin typo
