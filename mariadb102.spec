@@ -1373,6 +1373,7 @@ fi
 %{_bindir}/mysql_tzinfo_to_sql
 %{_bindir}/mysql_upgrade
 %{_bindir}/mysqld_safe
+%{_bindir}/mysqld_safe_helper
 %{_bindir}/innochecksum
 %{_bindir}/replace
 %{_bindir}/resolve_stack_dump
@@ -1564,8 +1565,6 @@ fi
 # Utilities that can be used remotely
 %{_bindir}/perror
 %{_mandir}/man1/perror.1*
-# Other utilities
-%{_bindir}/mysqld_safe_helper
 
 %if %{with devel}
 %files devel
@@ -1628,6 +1627,7 @@ fi
 - Build with readline instead of libedit
 - Enable mariadb@.service
 - Move mysql_upgrade to server subpackage
+- Move mysqld_safe_helper to server package for mysqld_safe
 
 * Mon Feb 18 2019 Michal Schorm <mschorm@redhat.com> - 3:10.2.22-1
 - Rebase to 10.2.22
