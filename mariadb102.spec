@@ -156,8 +156,8 @@
 %global sameevr   %{epoch}:%{version}-%{release}
 
 Name:             mariadb102
-Version:          10.2.22
-Release:          2%{?with_debug:.debug}%{?dist}
+Version:          10.2.23
+Release:          1%{?with_debug:.debug}%{?dist}
 Epoch:            3
 
 Summary:          A community developed branch of MySQL
@@ -1622,6 +1622,9 @@ fi
 %endif
 
 %changelog
+* Sat May 04 2019 Carl George <carl@george.computer> - 3:10.2.23-1
+- Latest upstream
+
 * Sat May 04 2019 Carl George <carl@george.computer> - 3:10.2.22-2
 - Port from Fedora to IUS
 - Build with readline instead of libedit
