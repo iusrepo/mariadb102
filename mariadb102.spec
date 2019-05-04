@@ -214,7 +214,7 @@ BuildRequires:    zlib-devel
 # asynchornous operations stuff
 BuildRequires:    libaio-devel
 # commands history features
-BuildRequires:    libedit-devel
+BuildRequires:    readline-devel
 # CLI graphic
 BuildRequires:    ncurses-devel
 # debugging stuff
@@ -836,6 +836,7 @@ export CFLAGS CXXFLAGS
          -DENABLE_DTRACE=ON \
          -DSECURITY_HARDENED=ON \
          -DWITH_EMBEDDED_SERVER=%{?with_embedded:ON}%{!?with_embedded:OFF} \
+         -DWITH_READLINE=ON \
          -DWITH_MARIABACKUP=%{?with_backup:ON}%{!?with_backup:NO} \
          -DWITH_UNIT_TESTS=%{?with_test:ON}%{!?with_test:NO} \
          -DCONC_WITH_SSL=%{?with_clibrary:ON}%{!?with_clibrary:NO} \
@@ -1623,6 +1624,7 @@ fi
 %changelog
 * Sat May 04 2019 Carl George <carl@george.computer> - 3:10.2.22-2
 - Port from Fedora to IUS
+- Build with readline instead of libedit
 
 * Mon Feb 18 2019 Michal Schorm <mschorm@redhat.com> - 3:10.2.22-1
 - Rebase to 10.2.22
