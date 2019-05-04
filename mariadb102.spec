@@ -1371,6 +1371,7 @@ fi
 %{_bindir}/mysql_install_db
 %{_bindir}/mysql_secure_installation
 %{_bindir}/mysql_tzinfo_to_sql
+%{_bindir}/mysql_upgrade
 %{_bindir}/mysqld_safe
 %{_bindir}/innochecksum
 %{_bindir}/replace
@@ -1422,6 +1423,7 @@ fi
 %{_mandir}/man1/mysql_install_db.1*
 %{_mandir}/man1/mysql_secure_installation.1*
 %{_mandir}/man1/mysql_tzinfo_to_sql.1*
+%{_mandir}/man1/mysql_upgrade.1*
 %{_mandir}/man1/mysqld_safe.1*
 %{_mandir}/man1/mysqld_safe_helper.1*
 %{_mandir}/man1/innochecksum.1*
@@ -1560,9 +1562,7 @@ fi
 %{_mandir}/man1/mysqlhotcopy.1*
 %{_mandir}/man1/mysql_setpermission.1*
 # Utilities that can be used remotely
-%{_bindir}/mysql_upgrade
 %{_bindir}/perror
-%{_mandir}/man1/mysql_upgrade.1*
 %{_mandir}/man1/perror.1*
 # Other utilities
 %{_bindir}/mysqld_safe_helper
@@ -1627,6 +1627,7 @@ fi
 - Port from Fedora to IUS
 - Build with readline instead of libedit
 - Enable mariadb@.service
+- Move mysql_upgrade to server subpackage
 
 * Mon Feb 18 2019 Michal Schorm <mschorm@redhat.com> - 3:10.2.22-1
 - Rebase to 10.2.22
