@@ -122,7 +122,7 @@
 %bcond_without unbundled_pcre
 %else
 %bcond_with unbundled_pcre
-%global pcre_bundled_version 8.42
+%global pcre_bundled_version 8.43
 %endif
 
 # Include systemd files
@@ -156,7 +156,7 @@
 %global sameevr   %{epoch}:%{version}-%{release}
 
 Name:             mariadb102
-Version:          10.2.23
+Version:          10.2.24
 Release:          1%{?with_debug:.debug}%{?dist}
 Epoch:            3
 
@@ -1622,6 +1622,9 @@ fi
 %endif
 
 %changelog
+* Mon May 27 2019 Carl George <carl@george.computer> - 3:10.2.24-1
+- Latest upstream
+
 * Sat May 04 2019 Carl George <carl@george.computer> - 3:10.2.23-1
 - Latest upstream
 
