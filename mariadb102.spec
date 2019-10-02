@@ -156,8 +156,8 @@
 %global sameevr   %{epoch}:%{version}-%{release}
 
 Name:             mariadb102
-Version:          10.2.26
-Release:          1%{?with_debug:.debug}%{?dist}
+Version:          10.2.27
+Release:          2%{?with_debug:.debug}%{?dist}
 Epoch:            3
 
 Summary:          A community developed branch of MySQL
@@ -1443,6 +1443,7 @@ fi
 %{_datadir}/%{pkg_name}/mysql_test_data_timezone.sql
 %{_datadir}/%{pkg_name}/mysql_to_mariadb.sql
 %{_datadir}/%{pkg_name}/mysql_performance_tables.sql
+%{_datadir}/%{pkg_name}/mysql_test_db.sql
 %if %{with mroonga}
 %{_datadir}/%{pkg_name}/mroonga/install.sql
 %{_datadir}/%{pkg_name}/mroonga/uninstall.sql
@@ -1622,6 +1623,12 @@ fi
 %endif
 
 %changelog
+* Wed Oct 10 2019 Luis M. Segundo <blackfile@fedoraproject.org> - 3:10.2.27-2
+- Add unpackaged file
+
+* Wed Oct 10 2019 Luis M. Segundo <blackfile@fedoraproject.org> - 3:10.2.27-1
+- Update upstream to 10.2.27
+
 * Thu Aug 15 2019 Carl George <carl@george.computer> - 3:10.2.26-1
 - Latest upstream
 
