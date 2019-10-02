@@ -1443,6 +1443,7 @@ fi
 %{_datadir}/%{pkg_name}/mysql_test_data_timezone.sql
 %{_datadir}/%{pkg_name}/mysql_to_mariadb.sql
 %{_datadir}/%{pkg_name}/mysql_performance_tables.sql
+%{_datadir}/%{pkg_name}/mysql_test_db.sql
 %if %{with mroonga}
 %{_datadir}/%{pkg_name}/mroonga/install.sql
 %{_datadir}/%{pkg_name}/mroonga/uninstall.sql
