@@ -157,7 +157,7 @@
 
 Name:             mariadb102
 Version:          10.2.27
-Release:          1%{?with_debug:.debug}%{?dist}
+Release:          2%{?with_debug:.debug}%{?dist}
 Epoch:            3
 
 Summary:          A community developed branch of MySQL
@@ -1623,6 +1623,9 @@ fi
 %endif
 
 %changelog
+* Wed Oct 10 2019 Luis M. Segundo <blackfile@fedoraproject.org> - 3:10.2.27-2
+- Add unpackaged file
+
 * Wed Oct 10 2019 Luis M. Segundo <blackfile@fedoraproject.org> - 3:10.2.27-1
 - Update upstream to 10.2.27
 
