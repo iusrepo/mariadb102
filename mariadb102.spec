@@ -156,7 +156,7 @@
 %global sameevr   %{epoch}:%{version}-%{release}
 
 Name:             mariadb102
-Version:          10.2.26
+Version:          10.2.27
 Release:          1%{?with_debug:.debug}%{?dist}
 Epoch:            3
 
@@ -1622,6 +1622,9 @@ fi
 %endif
 
 %changelog
+* Wed Oct 10 2019 Luis M. Segundo <blackfile@fedoraproject.org> - 3:10.2.27-1
+- Update upstream to 10.2.27
+
 * Thu Aug 15 2019 Carl George <carl@george.computer> - 3:10.2.26-1
 - Latest upstream
 
