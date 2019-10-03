@@ -1623,10 +1623,10 @@ fi
 %endif
 
 %changelog
-* Wed Oct 10 2019 Luis M. Segundo <blackfile@fedoraproject.org> - 3:10.2.27-2
+* Wed Oct 02 2019 Luis M. Segundo <blackfile@fedoraproject.org> - 3:10.2.27-2
 - Add unpackaged file
 
-* Wed Oct 10 2019 Luis M. Segundo <blackfile@fedoraproject.org> - 3:10.2.27-1
+* Wed Oct 02 2019 Luis M. Segundo <blackfile@fedoraproject.org> - 3:10.2.27-1
 - Update upstream to 10.2.27
 
 * Thu Aug 15 2019 Carl George <carl@george.computer> - 3:10.2.26-1
