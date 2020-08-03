@@ -156,7 +156,7 @@
 %global sameevr   %{epoch}:%{version}-%{release}
 
 Name:             mariadb102
-Version:          10.2.30
+Version:          10.2.32
 Release:          1%{?with_debug:.debug}%{?dist}
 Epoch:            3
 
@@ -1623,6 +1623,9 @@ fi
 %endif
 
 %changelog
+* Mon Aug 03 2020 Carl George <carl@george.computer> - 3:10.2.32-1
+- Latest upstream
+
 * Thu Jan 02 2020 Carl George <carl@george.computer> - 3:10.2.30-1
 - Latest upstream
 
